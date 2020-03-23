@@ -1,8 +1,6 @@
 #include <iostream>
 using namespace std;
 
-//typedef int* pint;
-
 class Matr{
 protected:
     static int allocated;

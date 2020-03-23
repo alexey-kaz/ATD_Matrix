@@ -2,9 +2,8 @@
 using namespace std;
 
 class Matr{
-protected:
-    static int allocated;
 public:
+    static int allocated;
     static int getAllocated() { return allocated; }
     virtual int getRow() const = 0;
     virtual int getColumn() const = 0;
@@ -143,10 +142,10 @@ public:
     friend istream& operator>>(istream &in, Matrix &matrix);
 };
 
-class squareMatrix : public Matrix{
+class Square_Matrix : public Matrix{
 public:
-    squareMatrix (int n) : Matrix(n,n) {}
-    squareMatrix(const squareMatrix &matrix) {
+    Square_Matrix (int n) : Matrix(n,n) {}
+    Square_Matrix(const Square_Matrix &matrix) {
         setRow(matrix.getRow());
         setColumn(matrix.getColumn());
         Create();
@@ -165,6 +164,62 @@ istream& operator>>(istream &in, Matrix &matrix){
     return in;
 };
 
+void reassignHelp (int number, Matrix &matrix) {
+    cout << endl << number << "-ая матрица до преобразования: " << endl << matrix << endl;
+    cout << "Введите размер новой матрицы через разделители" << endl;
+    int i1, j1;
+    cin >> i1 >> j1;
+    Matrix tmpMatrix(i1, j1);
+    cout << "Введите новую матрицу через разделители" << endl;
+    cin >> tmpMatrix;
+    matrix = tmpMatrix;
+    cout << endl << number << "-ая матрица после перезаписи: " << endl << matrix << endl;
+}
+
+void elementHelp (int number, Matrix &matrix) {
+    cout << endl << number << "-ая матрица: " << endl << matrix << endl;
+    cout << "Введите строку и столбец элемента через разделители" << endl;
+    int k, l;
+    cin >> k >> l;
+    if ((k <= matrix.getRow()) && (l <= matrix.getColumn())) {
+        cout << endl << matrix.element(k-1, l-1) << endl << endl;
+    } else {
+        cout << "Выходит за границу матрицы" << endl << endl;
+    }
+}
+
+void numberMultHelp (int number, Matrix &matrix) {
+    cout << endl << number << "-ая матрица: " << endl << matrix << endl;
+    cout << "Введите число, на которое нужно умножить матрицу" << endl;
+    int k;
+    cin >> k;
+    matrix.multBy(k);
+    cout << endl << number << "-ая матрица после умножения на число: " << endl << matrix << endl << endl;
+}
+
+void matrMultHelp (Matrix &matrix1, Matrix &matrix2){
+    if (matrix1.getColumn() == matrix2.getRow()){
+        matrix1 = matrix1 * matrix2;
+        cout << endl << "Произведение: " << endl << matrix1 << endl << endl;
+    } else {
+        cout << "Перемножение невозможно, неправильная размерность" << endl;
+    }
+}
+
+void matrMultDecide (int number2, Matrix &matrix1, Matrix &matrix2) {
+    switch (number2) {
+        case 1:
+            matrMultHelp(matrix1, matrix1);
+            break;
+        case 2:
+            matrMultHelp(matrix1, matrix2);
+            break;
+        default:
+            cout << "Матрицы с номером " << number2 << " нет" << endl;
+            break;
+    }
+}
+
 int main() {
     cout << "Вызов инструкции - help \n";
     string str;
@@ -176,119 +231,71 @@ int main() {
     cin >> str;
     while (!cin.eof()){
         if (str == "help") {
-            cout << "\nreassign - перезаписать матрицу \ncopy - копирование одной матрицы в другую \nelement - вывод элемента строки i столбца j \nnumber_mult - умножение матрицы на число \nmatrix_mult - перемножение матриц \nend - завершение работы\n\n";
+            cout << "\nreassign - перезаписать матрицу \ncopy - копирование одной матрицы в другую \nelement - вывод элемента строки i столбца j \nnumber_mult - умножение матрицы на число \nmatrix_mult - перемножение матриц \nallocated - кол-во использованной памяти в битах \nend - завершение работы\n\n";
         } else if (str == "reassign") {
-            int a;
+            int matrixNumber;
             cout << "Введите номер матрицы, которую требуется перезаписать \n1 или 2 \n";
-            cin >> a;
-            if (a == 1){
-                cout << endl << "Первая матрица до преобразования: " << endl << first << endl;
-                cout << "Введите размер новой матрицы через разделители" << endl;
-                int i1, j1;
-                cin >> i1 >> j1;
-                Matrix c(i1, j1);
-                cout << "Введите новую матрицу через разделители" << endl;
-                cin >> c;
-                first = c;
-                cout << endl << "Первая матрица после перезаписи: " << endl << first << endl;
-            } else if (a == 2) {
-                cout << endl << "Вторая матрица до преобразования: " << endl << second << endl;
-                cout << "Введите размер новой матрицы через разделители" << endl;
-                int i1, j1;
-                cin >> i1 >> j1;
-                Matrix c(i1, j1);
-                cout << "Введите новую матрицу через разделители" << endl;
-                cin >> c;
-                second = c;
-                cout << endl << "Вторая матрица после перезаписи: " << endl << second << endl;
-            } else {
-                cout << "Матрицы с номером " << a << " нет" << endl;
+            cin >> matrixNumber;
+            switch (matrixNumber) {
+                case 1:
+                    reassignHelp(matrixNumber, first);
+                    break;
+                case 2:
+                    reassignHelp(matrixNumber, second);
+                    break;
+                default:
+                    cout << "Матрицы с номером " << matrixNumber << " нет" << endl;
+                    break;
             }
         } else if (str == "element") {
             cout << "Элемент какой матрицы требуется вывести?" << endl;
-            int a;
-            cin >> a;
-            if (a == 1){
-                cout << endl << "Первая матрица: " << endl << first << endl;
-                cout << "Введите строку и столбец элемента через разделители" << endl;
-                int k, l;
-                cin >> k >> l;
-                if ((k <= first.getRow()) && (l <= first.getColumn())) {
-                    cout << endl << first.element(k-1, l-1) << endl << endl;
-                } else {
-                    cout << "Выходит за границу матрицы" << endl << endl;
-                }
-            } else if (a == 2){
-                cout << endl << "Вторая матрица: " << endl << second << endl;
-                cout << "Введите строку и столбец элемента через разделители" << endl;
-                int k, l;
-                cin >> k >> l;
-                if ((k <= second.getRow()) && (l <= second.getColumn())) {
-                    cout << endl << second.element(k-1, l-1) << endl << endl;
-                } else {
-                    cout << "Выходит за границу матрицы" << endl << endl;
-                }
-            } else {
-                cout << "Матрицы с номером " << a << " нет" << endl;
+            int matrixNumber;
+            cin >> matrixNumber;
+            switch (matrixNumber) {
+                case 1:
+                    elementHelp(matrixNumber, first);
+                    break;
+                case 2:
+                    elementHelp(matrixNumber, second);
+                    break;
+                default:
+                    cout << "Матрицы с номером " << matrixNumber << " нет" << endl;
+                    break;
             }
         } else if (str == "number_mult") {
             cout << "Какую матрицу умножаем на число?" << endl;
-            int a;
-            cin >> a;
-            if (a == 1){
-                cout << endl << "Первая матрица: " << endl << first << endl;
-                cout << "Введите число, на которое нужно умножить матрицу" << endl;
-                int k;
-                cin >> k;
-                first.multBy(k);
-                cout << endl << "Первая матрица после умножения на число: " << endl << first << endl << endl;
-            } else if (a == 2){
-                cout << endl << "Вторая матрица: " << endl << second << endl;
-                cout << "Введите число, на которое нужно умножить матрицу" << endl;
-                int k;
-                cin >> k;
-                first.multBy(k);
-                cout << endl << "Вторая матрица после умножения на число: " << endl << second << endl << endl;
-            } else {
-                cout << "Матрицы с номером " << a << " нет" << endl;
+            int matrixNumber;
+            cin >> matrixNumber;
+            switch (matrixNumber) {
+                case 1:
+                    numberMultHelp(matrixNumber, first);
+                    break;
+                case 2:
+                    numberMultHelp(matrixNumber, second);
+                    break;
+                default:
+                    cout << "Матрицы с номером " << matrixNumber << " нет" << endl;
+                    break;
             }
         } else if (str == "matrix_mult") {
             cout << endl << "Первая матрица: " << endl << first << endl;
             cout << "Вторая матрица: " << endl << second << endl;
-            cout << "Какую матрицу умножаем на другую?" << endl << "Введите 11, если умножаем первую на первую" << endl << "Введите 12, если умножаем первую на вторую" << endl << "Введите 21, если умножаем вторую на первую" << endl << "Введите 22, если умножаем вторую на вторую" << endl ;
-            int a;
-            cin >> a;
-            if (a == 11){
-                if (first.getColumn() == first.getRow()){
-                    first = first * first;
-                    cout << endl << "Первая матрица после умножения на себя: " << endl << first << endl << endl;
-                } else {
-                    cout << "Перемножение невозможно, неправильная размерность" << endl;
-                }
-            } else if (a == 12){
-                if (first.getColumn() == second.getRow()){
-                    first = first * second;
-                    cout << endl << "Первая матрица после умножения на вторую: " << endl << first << endl << endl;
-                } else {
-                    cout << "Перемножение невозможно, неправильная размерность" << endl;
-                }
-            } else if (a == 21){
-                if (second.getColumn() == first.getRow()){
-                    second = second * first;
-                    cout << endl << "Вторая матрица после умножения на первую: " << endl << second << endl << endl;
-                } else {
-                    cout << "Перемножение невозможно, неправильная размерность" << endl;
-                }
-            } else if (a == 22){
-                if (second.getColumn() == second.getRow()){
-                    second = second * second;
-                    cout << endl << "Вторая матрица после умножения на себя: " << endl << second << endl << endl;
-                } else {
-                    cout << "Перемножение невозможно, неправильная размерность" << endl;
-                }
-            } else {
-                cout << "Матрицы с номером " << a << " нет" << endl;
+            cout << "Какую матрицу умножаем на другую?" << endl << "Введите 1 1, если умножаем первую на первую" << endl << "Введите 1 2, если умножаем первую на вторую" << endl << "Введите 2 1, если умножаем вторую на первую" << endl << "Введите 2 2, если умножаем вторую на вторую" << endl ;
+            int matrix1, matrix2;
+            cin >> matrix1 >> matrix2;
+            switch (matrix1) {
+                case 1:
+                    matrMultDecide(matrix2, first, second);
+                    break;
+                case 2:
+                    matrMultDecide(matrix2, second, first);
+                    break;
+                default:
+                    cout << "Матрицы с номером " << matrix1 << " нет" << endl;
+                    break;
             }
+        } else if (str == "allocated") {
+            cout << "Использовано " << Matr::allocated << " бита" << endl << endl;
         } else if (str == "end") {
             cout << endl;
             break;
